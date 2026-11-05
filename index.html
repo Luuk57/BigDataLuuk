@@ -105,7 +105,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = 'JOUW_GOOGLE_SCRIPT_URL_HIER';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzelrS9MRQOj7mKDgAz7Bpt9IiIgrmpaYMl34vAYmfQDCEWy6eqVBrjM6W87Ze-eAWPjg/exec';
 
     function openTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -147,11 +147,14 @@
 
       fetch(SCRIPT_URL, {
         method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(payload)
       })
-      .then(res => res.json())
-      .then(data => {
-        alert('Succesvol opgeslagen!');
+      .then(() => {
+        alert('Succesvol verzonden!');
         document.getElementById(formId).reset();
       })
       .catch(err => alert('Fout bij opslaan'))
@@ -195,7 +198,7 @@
         });
       })
       .catch(err => {
-        tbody.innerHTML = '<tr><td colspan="3">Fout bij laden overzicht.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="3">Fout bij laden overzicht. Controleer de web-app rechten in Google Script.</td></tr>';
       });
     }
   </script>
