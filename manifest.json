@@ -2,20 +2,23 @@
   "name": "Eten Logboek",
   "short_name": "EtenLog",
   "description": "Log snel je voeding en bekijk je historie",
-  "start_url": "./index.html",
+  "start_url": "https://luuk57.github.io/BigDataLuuk/",
+  "scope": "https://luuk57.github.io/BigDataLuuk/",
   "display": "standalone",
   "background_color": "#f4f6f8",
   "theme_color": "#28a745",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
+      "src": "https://img.icons8.com/color/192/apple.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
+      "src": "https://img.icons8.com/color/512/apple.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
