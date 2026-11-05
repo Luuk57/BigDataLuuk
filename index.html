@@ -28,10 +28,16 @@
     button.submit-btn { width: 100%; margin-top: 20px; padding: 14px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
     button.submit-btn:disabled { background: #888; }
     
-    /* Tabel */
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-    th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #ddd; }
-    th { background-color: #f8f9fa; }
+    /* Tabel opmaak */
+    .table-responsive { overflow-x: auto; margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 600px; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #ddd; vertical-align: middle; }
+    th { background-color: #f8f9fa; font-size: 13px; color: #555; }
+    
+    /* Knoppen in tabel */
+    .btn-actie { padding: 6px 10px; border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; margin-right: 4px; }
+    .btn-edit { background-color: #ffc107; color: #212529; }
+    .btn-delete { background-color: #dc3545; color: white; }
   </style>
 </head>
 <body>
@@ -39,7 +45,7 @@
   <!-- Tab Knoppen -->
   <div class="tabs">
     <button class="tab-btn active" onclick="openTab('invoer')">🍎 Eten Invoeren</button>
-    <button class="tab-btn" onclick="openTab('historie')">📋 Historie</button>
+    <button class="tab-btn" onclick="openTab('historie')">📋 Historie & Beheer</button>
   </div>
 
   <!-- Tab 1: Eten Invoeren -->
@@ -89,21 +95,25 @@
 
   <!-- Tab 2: Historie -->
   <div id="tab-historie" class="tab-content">
-    <h2>Gelogd Eten</h2>
-    <button onclick="laadHistorie()" style="margin-bottom: 10px; padding: 8px 12px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">Verversen</button>
+    <h2>Gelogd Eten Overzicht</h2>
+    <button onclick="laadHistorie()" style="margin-bottom: 12px; padding: 8px 12px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">🔄 Verversen</button>
     
-    <table>
-      <thead>
-        <tr>
-          <th>Tijd</th>
-          <th>Wat</th>
-          <th>Hoeveel</th>
-        </tr>
-      </thead>
-      <tbody id="historieTabel">
-        <tr><td colspan="3">Gegevens laden...</td></tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Datum & Tijd</th>
+            <th>Soort</th>
+            <th>Hoeveelheid</th>
+            <th>Notitie</th>
+            <th>Acties</th>
+          </tr>
+        </thead>
+        <tbody id="historieTabel">
+          <tr><td colspan="5">Gegevens laden...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <script>
@@ -121,11 +131,12 @@
       }
     }
 
-    // Eten verzenden
+    // Eten verzenden (Nieuw)
     document.getElementById('formEten').addEventListener('submit', e => {
       e.preventDefault();
       
       const payload = {
+        actie: 'CREATE',
         soortEten: document.getElementById('soortEten').value,
         aantal: document.getElementById('aantal').value,
         eenheid: document.getElementById('eenheid').value,
@@ -154,43 +165,102 @@
       });
     });
 
-    // Historie ophalen met nette datum- en tijdweergave
+    // Historie ophalen met alle kolommen
     function laadHistorie() {
       const tbody = document.getElementById('historieTabel');
-      tbody.innerHTML = '<tr><td colspan="3">Laden...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5">Laden...</td></tr>';
 
       fetch(SCRIPT_URL)
       .then(res => res.json())
       .then(data => {
         tbody.innerHTML = '';
-        if (data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="3">Nog niets gelogd vandaag.</td></tr>';
+        if (!data || data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5">Nog niets gelogd.</td></tr>';
           return;
         }
+        
         data.reverse().forEach(row => {
-          let schoneDatum = row.datum;
-          let schoneTijd = row.tijd;
+          let schoneDatum = row.datum || '';
+          let schoneTijd = row.tijd || '';
 
-          // Opschonen als Google een ISO-indeling meegeeft
-          if (schoneDatum && schoneDatum.includes('T')) {
+          if (schoneDatum.includes('T')) {
             schoneDatum = new Date(schoneDatum).toLocaleDateString('nl-NL');
           }
-          if (schoneTijd && schoneTijd.includes('T')) {
+          if (schoneTijd.includes('T')) {
             schoneTijd = new Date(schoneTijd).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
           }
 
           tbody.innerHTML += `
             <tr>
               <td><small style="color: #666;">${schoneDatum}</small><br><b>${schoneTijd}</b></td>
-              <td><b>${row.soortEten}</b><br><small style="color: #666;">${row.notitie}</small></td>
+              <td><b>${row.soortEten}</b></td>
               <td>${row.aantal} ${row.eenheid}</td>
+              <td>${row.notitie || '-'}</td>
+              <td style="white-space: nowrap;">
+                <button class="btn-actie btn-edit" onclick="bewerkRegel(${row.rowIndex}, '${row.soortEten}', '${row.aantal}', '${row.eenheid}', '${row.notitie}')">✏️</button>
+                <button class="btn-actie btn-delete" onclick="verwijderRegel(${row.rowIndex})">🗑️</button>
+              </td>
             </tr>
           `;
         });
       })
       .catch(err => {
-        tbody.innerHTML = '<tr><td colspan="3">Fout bij laden. Controleer de Google Script rechten.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5">Fout bij laden van overzicht.</td></tr>';
       });
+    }
+
+    // Regel bewerken
+    function bewerkRegel(rowIndex, oudeSoort, oudAantal, oudeEenheid, oudeNotitie) {
+      const nieuwSoort = prompt("Soort Eten:", oudeSoort);
+      if (nieuwSoort === null) return;
+
+      const nieuwAantal = prompt("Aantal:", oudAantal);
+      if (nieuwAantal === null) return;
+
+      const nieuwEenheid = prompt("Eenheid (Stuk, Portie, Boterham, Kom / Schaal, Bord, Gram, Handje):", oudeEenheid);
+      if (nieuwEenheid === null) return;
+
+      const nieuwNotitie = prompt("Notitie / Omschrijving:", oudeNotitie);
+      if (nieuwNotitie === null) return;
+
+      const payload = {
+        actie: 'EDIT',
+        rowIndex: rowIndex,
+        soortEten: nieuwSoort,
+        aantal: nieuwAantal,
+        eenheid: nieuwEenheid,
+        notitie: nieuwNotitie
+      };
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(() => {
+        alert('Regel bijgewerkt!');
+        laadHistorie();
+      });
+    }
+
+    // Regel verwijderen
+    function verwijderRegel(rowIndex) {
+      if (confirm("Weet je zeker dat je deze invoer wilt verwijderen?")) {
+        const payload = {
+          actie: 'DELETE',
+          rowIndex: rowIndex
+        };
+
+        fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).then(() => {
+          alert('Regel verwijderd!');
+          laadHistorie();
+        });
+      }
     }
   </script>
 </body>
