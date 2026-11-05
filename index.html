@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mijn Logboek</title>
+  <title>Eten Logboek</title>
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { margin: 0; padding: 15px; background-color: #f4f6f8; color: #333; }
@@ -11,7 +11,7 @@
     /* Navigatie Tabs */
     .tabs { display: flex; gap: 5px; margin-bottom: 20px; background: #e0e0e0; padding: 4px; border-radius: 10px; }
     .tab-btn { flex: 1; padding: 12px 5px; border: none; background: transparent; font-weight: bold; border-radius: 8px; font-size: 15px; cursor: pointer; }
-    .tab-btn.active { background: #ffffff; color: #007bff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .tab-btn.active { background: #ffffff; color: #28a745; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     
     /* Inhoud per tab */
     .tab-content { display: none; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
@@ -20,85 +20,87 @@
     /* Formulieren */
     h2 { margin-top: 0; color: #111; font-size: 20px; }
     label { display: block; margin-top: 12px; font-weight: 600; font-size: 14px; }
-    input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
-    button.submit-btn { width: 100%; margin-top: 20px; padding: 14px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; background-color: white; }
+    
+    .grid-2 { display: flex; gap: 10px; }
+    .grid-2 > div { flex: 1; }
+    
+    button.submit-btn { width: 100%; margin-top: 20px; padding: 14px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
     button.submit-btn:disabled { background: #888; }
     
-    /* Instellingen & Overzicht Tabel */
-    .limiet-box { background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e9ecef; }
-    .limiet-box label { margin-top: 0; }
-    
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
+    /* Tabel */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+    th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #ddd; }
     th { background-color: #f8f9fa; }
-    
-    /* Kleurcodes Vocht */
-    .status-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 13px; }
-    .status-groen { background-color: #d4edda; color: #155724; }
-    .status-oranje { background-color: #fff3cd; color: #856404; }
-    .status-rood { background-color: #f8d7da; color: #721c24; }
   </style>
 </head>
 <body>
 
   <!-- Tab Knoppen -->
   <div class="tabs">
-    <button class="tab-btn active" onclick="openTab('eten')">🍎 Eten</button>
-    <button class="tab-btn" onclick="openTab('drinken')">💧 Drinken</button>
-    <button class="tab-btn" onclick="openTab('overzicht')">📊 Overzicht</button>
+    <button class="tab-btn active" onclick="openTab('invoer')">🍎 Eten Invoeren</button>
+    <button class="tab-btn" onclick="openTab('historie')">📋 Historie</button>
   </div>
 
-  <!-- Tab 1: Eten -->
-  <div id="tab-eten" class="tab-content active">
+  <!-- Tab 1: Eten Invoeren -->
+  <div id="tab-invoer" class="tab-content active">
     <h2>Eten Loggen</h2>
     <form id="formEten">
-      <label>Wat heb je gegeten?</label>
-      <input type="text" id="etenOmschrijving" placeholder="bijv. 2 boterhammen met kaas" required>
       
-      <label>Optionele notitie</label>
-      <input type="text" id="etenNotitie" placeholder="bijv. Ontbijt">
+      <label>Soort Eten</label>
+      <select id="soortEten" required>
+        <option value="" disabled selected>Kies een categorie...</option>
+        <option value="Ontbijt">Ontbijt</option>
+        <option value="Lunch">Lunch</option>
+        <option value="Avondeten">Avondeten</option>
+        <option value="Tussendoortje">Tussendoortje / Snack</option>
+        <option value="Fruit">Fruit</option>
+        <option value="Groente">Groente</option>
+        <option value="Brood / Graanproducten">Brood / Graanproducten</option>
+        <option value="Eiwitrijk (Vlees/Vis/Ei)">Eiwitrijk (Vlees/Vis/Ei)</option>
+        <option value="Zuivel">Zuivel</option>
+      </select>
+
+      <div class="grid-2">
+        <div>
+          <label>Aantal</label>
+          <input type="number" step="0.5" id="aantal" placeholder="1" value="1" required>
+        </div>
+        <div>
+          <label>Eenheid</label>
+          <select id="eenheid" required>
+            <option value="Stuk">Stuk</option>
+            <option value="Portie">Portie</option>
+            <option value="Boterham">Boterham</option>
+            <option value="Kom / Schaal">Kom / Schaal</option>
+            <option value="Bord">Bord</option>
+            <option value="Gram">Gram</option>
+            <option value="Handje">Handje</option>
+          </select>
+        </div>
+      </div>
+      
+      <label>Omschrijving / Notitie</label>
+      <input type="text" id="notitie" placeholder="bijv. 2 boterhammen met jonge kaas" required>
       
       <button type="submit" class="submit-btn">Opslaan</button>
     </form>
   </div>
 
-  <!-- Tab 2: Drinken -->
-  <div id="tab-drinken" class="tab-content">
-    <h2>Drinken Loggen</h2>
-    <form id="formDrinken">
-      <label>Wat heb je gedronken?</label>
-      <input type="text" id="drinkenOmschrijving" placeholder="bijv. Water, Thee, Koffie" required>
-      
-      <label>Hoeveelheid (ml)</label>
-      <input type="number" id="drinkenMl" placeholder="bijv. 250" required>
-      
-      <label>Optionele notitie</label>
-      <input type="text" id="drinkenNotitie" placeholder="bijv. Bij het middageten">
-      
-      <button type="submit" class="submit-btn">Opslaan</button>
-    </form>
-  </div>
-
-  <!-- Tab 3: Overzicht -->
-  <div id="tab-overzicht" class="tab-content">
-    <h2>Dagelijks Overzicht</h2>
-    
-    <div class="limiet-box">
-      <label>Dagelijkse Vochtlimiet (ml):</label>
-      <input type="number" id="vochtLimiet" value="1500" onchange="laadOverzicht()">
-    </div>
-
-    <button onclick="laadOverzicht()" style="margin-bottom: 10px; padding: 8px 12px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">Verversen</button>
+  <!-- Tab 2: Historie -->
+  <div id="tab-historie" class="tab-content">
+    <h2>Gelogd Eten</h2>
+    <button onclick="laadHistorie()" style="margin-bottom: 10px; padding: 8px 12px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">Verversen</button>
     
     <table>
       <thead>
         <tr>
-          <th>Datum</th>
-          <th>Vocht</th>
-          <th>Eten</th>
+          <th>Tijd</th>
+          <th>Wat</th>
+          <th>Hoeveel</th>
         </tr>
       </thead>
-      <tbody id="overzichtTabel">
+      <tbody id="historieTabel">
         <tr><td colspan="3">Gegevens laden...</td></tr>
       </tbody>
     </table>
@@ -114,60 +116,47 @@
       document.getElementById('tab-' + tabName).classList.add('active');
       event.currentTarget.classList.add('active');
 
-      if (tabName === 'overzicht') {
-        laadOverzicht();
+      if (tabName === 'historie') {
+        laadHistorie();
       }
     }
 
     // Eten verzenden
     document.getElementById('formEten').addEventListener('submit', e => {
       e.preventDefault();
-      verzendData({
-        type: 'Eten',
-        omschrijving: document.getElementById('etenOmschrijving').value,
-        notitie: document.getElementById('etenNotitie').value
-      }, 'formEten');
-    });
+      
+      const payload = {
+        soortEten: document.getElementById('soortEten').value,
+        aantal: document.getElementById('aantal').value,
+        eenheid: document.getElementById('eenheid').value,
+        notitie: document.getElementById('notitie').value
+      };
 
-    // Drinken verzenden
-    document.getElementById('formDrinken').addEventListener('submit', e => {
-      e.preventDefault();
-      verzendData({
-        type: 'Drinken',
-        omschrijving: document.getElementById('drinkenOmschrijving').value,
-        hoeveelheidMl: document.getElementById('drinkenMl').value,
-        notitie: document.getElementById('drinkenNotitie').value
-      }, 'formDrinken');
-    });
-
-    function verzendData(payload, formId) {
-      const btn = document.querySelector(`#${formId} .submit-btn`);
+      const btn = document.querySelector('#formEten .submit-btn');
       btn.disabled = true;
       btn.innerText = 'Opslaan...';
 
       fetch(SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
       .then(() => {
-        alert('Succesvol verzonden!');
-        document.getElementById(formId).reset();
+        alert('Eten succesvol opgeslagen!');
+        document.getElementById('formEten').reset();
+        document.getElementById('aantal').value = "1";
       })
       .catch(err => alert('Fout bij opslaan'))
       .finally(() => {
         btn.disabled = false;
         btn.innerText = 'Opslaan';
       });
-    }
+    });
 
-    // Overzicht ophalen met Kleurcodes
-    function laadOverzicht() {
-      const tbody = document.getElementById('overzichtTabel');
-      const limiet = Number(document.getElementById('vochtLimiet').value) || 1500;
+    // Historie ophalen
+    function laadHistorie() {
+      const tbody = document.getElementById('historieTabel');
       tbody.innerHTML = '<tr><td colspan="3">Laden...</td></tr>';
 
       fetch(SCRIPT_URL)
@@ -175,30 +164,21 @@
       .then(data => {
         tbody.innerHTML = '';
         if (data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="3">Nog geen gegevens gelogd.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="3">Nog niets gelogd vandaag.</td></tr>';
           return;
         }
         data.reverse().forEach(row => {
-          const vocht = Number(row.totaalVocht) || 0;
-          let klasse = 'status-groen';
-
-          if (vocht >= limiet) {
-            klasse = 'status-rood';
-          } else if (vocht >= limiet * 0.85) {
-            klasse = 'status-oranje';
-          }
-
           tbody.innerHTML += `
             <tr>
-              <td>${row.datum}</td>
-              <td><span class="status-badge ${klasse}">${vocht} / ${limiet} ml</span></td>
-              <td>${row.aantalEten}x gegeten</td>
+              <td><small>${row.datum}</small><br><b>${row.tijd}</b></td>
+              <td><b>${row.soortEten}</b><br><small>${row.notitie}</small></td>
+              <td>${row.aantal} ${row.eenheid}</td>
             </tr>
           `;
         });
       })
       .catch(err => {
-        tbody.innerHTML = '<tr><td colspan="3">Fout bij laden overzicht. Controleer de web-app rechten in Google Script.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="3">Fout bij laden. Controleer de Google Script rechten.</td></tr>';
       });
     }
   </script>
