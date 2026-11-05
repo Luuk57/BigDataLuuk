@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eten Logboek</title>
+  
+  <!-- PWA Links & Meta Tags -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#28a745">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="EtenLog">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3075/3075977.png">
+
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { margin: 0; padding: 15px; background-color: #f4f6f8; color: #333; }
@@ -119,6 +128,15 @@
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzelrS9MRQOj7mKDgAz7Bpt9IiIgrmpaYMl34vAYmfQDCEWy6eqVBrjM6W87Ze-eAWPjg/exec';
 
+    // Registreer Service Worker voor PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker geregistreerd!'))
+          .catch(err => console.log('Service Worker mislukt:', err));
+      });
+    }
+
     function openTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -131,7 +149,7 @@
       }
     }
 
-    // Eten verzenden (Nieuw)
+    // Eten verzenden
     document.getElementById('formEten').addEventListener('submit', e => {
       e.preventDefault();
       
@@ -165,7 +183,7 @@
       });
     });
 
-    // Historie ophalen met alle kolommen
+    // Historie ophalen
     function laadHistorie() {
       const tbody = document.getElementById('historieTabel');
       tbody.innerHTML = '<tr><td colspan="5">Laden...</td></tr>';
