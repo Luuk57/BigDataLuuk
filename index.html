@@ -154,7 +154,7 @@
       });
     });
 
-    // Historie ophalen
+    // Historie ophalen met nette datum- en tijdweergave
     function laadHistorie() {
       const tbody = document.getElementById('historieTabel');
       tbody.innerHTML = '<tr><td colspan="3">Laden...</td></tr>';
@@ -168,10 +168,21 @@
           return;
         }
         data.reverse().forEach(row => {
+          let schoneDatum = row.datum;
+          let schoneTijd = row.tijd;
+
+          // Opschonen als Google een ISO-indeling meegeeft
+          if (schoneDatum && schoneDatum.includes('T')) {
+            schoneDatum = new Date(schoneDatum).toLocaleDateString('nl-NL');
+          }
+          if (schoneTijd && schoneTijd.includes('T')) {
+            schoneTijd = new Date(schoneTijd).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+          }
+
           tbody.innerHTML += `
             <tr>
-              <td><small>${row.datum}</small><br><b>${row.tijd}</b></td>
-              <td><b>${row.soortEten}</b><br><small>${row.notitie}</small></td>
+              <td><small style="color: #666;">${schoneDatum}</small><br><b>${schoneTijd}</b></td>
+              <td><b>${row.soortEten}</b><br><small style="color: #666;">${row.notitie}</small></td>
               <td>${row.aantal} ${row.eenheid}</td>
             </tr>
           `;
@@ -184,4 +195,3 @@
   </script>
 </body>
 </html>
-
